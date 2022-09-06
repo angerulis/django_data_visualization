@@ -1,0 +1,366 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <link
+      href="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/css/bootstrap.min.css"
+      rel="stylesheet"
+    />
+    <script src="https://cdn.jsdelivr.net/npm/jquery@3.6.1/dist/jquery.min.js"></script>
+    <link
+      href="https://getbootstrap.com/docs/5.2/assets/css/docs.css"
+      rel="stylesheet"
+    />
+    <title>Creer modele</title>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.2.0/dist/js/bootstrap.bundle.min.js"></script>
+</head>
+<body>
+<main>
+    <div class='container-fluid'>
+        <nav class="navbar navbar-expand-lg navbar-light bg-light">
+  <div class="container-fluid">
+    <a class="navbar-brand" href="#"><img class="img-fluid w-75" src="{% static 'image/Logo-SNDI.png' %}"></a>
+    <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarScroll" aria-controls="navbarScroll" aria-expanded="false" aria-label="Toggle navigation">
+      <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse" id="navbarScroll">
+      <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
+        <li class="nav-item px-1">
+            <form method = "POST"  action="{% url 'previewLayout'%}">
+                {% csrf_token %}
+                {{ formset.as_p }}
+                <a target="_blank" class="btn btn-warning" onclick="preview()" type="submit" href="{% url 'previewLayout' %}">Previsualiser</a>
+            </form>
+        </li>
+          <li class="nav-item px-1">
+              <a class="btn btn-bd-light" onclick="resetLayout()" href="#">Annuler</a>
+          </li>
+      </ul>
+      <form class="d-flex" onsubmit="save()" >
+          {% csrf_token %}
+          {{ formset.as_p }}
+          <button class="btn btn-success me-2" formmethod="post" type="submit" href="#" onclick="save()" >Sauvegarder</button>
+      </form>
+    </div>
+  </div>
+</nav>
+            <div class="">
+                <div class="bd-gray text-center border-bottom">
+                    <h1>Creation d'un Nouveau Modèle</h1>
+                </div>
+                <div class="border-bottom">
+                    <div class="input-group">
+
+                        <input type="text" id= 'model_title' class="form-control text-center border-0" placeholder="Titre du Modèle" >
+                    </div>
+
+                </div>
+                <div class="h2 offset-1"> Bloc
+                    <div class="btn-primary btn" onclick="addBloc('bloc_container')">Ajouter un Bloc</div>
+                    <div class="btn-danger btn" onclick="removeLastBloc()">Supprimer un Bloc</div>
+                </div>
+            </div>
+            <div id="bloc_container">
+
+            </div>
+        </div>
+    </div>
+
+
+</main>
+
+</body>
+<script>
+var bloc_index = 0;
+var item_index = 0;
+var item_dic = {};
+var item_class_layout = ['col-lg-','col-md-','col-sm-'];
+function createBloc(Id){
+    var bloc = document.createElement('div');
+    bloc.className = 'row ' + 'bloc';
+    bloc.id = 'bloc' + Id;
+    var blocHead = document.createElement('div');
+    blocHead.className = 'hstack gap-3 py-4'
+    var title = document.createElement('h5');
+    title.innerHTML = 'Bloc ' + Id;
+    var addBtn = createdropdown(bloc.id + '_addbtn', 'btn-primary btn bloc_add');
+    /*addBtn.addEventListener('click',function (btn) {
+        addItem(this.id)
+    })*/
+
+
+    var removeBtn = document.createElement('button');
+    removeBtn.className  = 'btn-danger btn bloc_remove'
+    removeBtn.id = bloc.id + '_removebtn'
+    removeBtn.innerText = 'supprimer item';
+    removeBtn.addEventListener('click', function (btn){
+        removeLastItem(this.id)
+    })
+    blocHead.append(title);
+    blocHead.append(addBtn);
+    blocHead.append(removeBtn);
+    bloc.insertAdjacentElement('afterbegin', blocHead);
+
+    return bloc;
+}
+function createCard(type, id, size = 4, add_className = '') {
+    var el0 = document.createElement('div');
+    var el2 = document.createElement('div');
+    var el3 = document.createElement('div');
+    var el4 = document.createElement('div');
+    el0.className = item_class_layout[0] + size + ' ' + add_className + ' graphique';
+    el2.className = "card mb-4";
+    el3.className = "card-header chart-title text-center";
+    el4.className = "card-body text-center " + type;
+    el4.id = '' + id;
+
+    let title;
+
+    if(type === 'number'){
+        el0.className = item_class_layout[2] + size + ' ' + add_className + ' afficheur';
+        el2.className = "card mb-4 number-card";
+        el3.className = 'card-header countupLabel text-center';
+        el4.className+= ' countup text-center h2 fw-light';
+        el4.innerText = 123.456.toString()
+
+    }else{
+        let graphList = ['PieChart', 'ColumnChart', 'BarChart', 'Table', 'LineChart'];
+        let graphItem = ['camembert', 'Histogramme Vertical','Histogramme Horizontal', 'Tableau', 'Courbe' ]
+        let selector = document.createElement('select');
+        selector.className = 'form-select';
+        selector.setAttribute('aria-label',"Default select example")
+        let option = document.createElement('option');
+        option.selected = true;
+        option.innerText = 'Type de graphe';
+        selector.append(option);
+        for (let i = 0; i < graphList.length; i++) {
+            let option = document.createElement('option');
+            option.value = graphList[i];
+            option.innerText = graphItem[i];
+            selector.append(option)
+        }
+        el3.append(selector)
+        let image = document.createElement('img');
+        image.alt = 'Graphique';
+        image.src = '{% static 'image/grahIcon.png' %}'
+        image.className = 'img-fluid w-25 ';
+        el4.append(image)
+    }
+
+    el2.append(el3);
+    el2.append(el4);
+    el0.appendChild(el2);
+    return el0;
+}
+
+function addBloc(containerId){
+    bloc_index++;
+    var node = createBloc(bloc_index);
+    document.getElementById(containerId).insertAdjacentElement('beforeend', node);
+}
+
+function addItem(containerId, type = 'number'){
+    let itemSize = 12 / (item_index + 1) >>0
+    let blocId = containerId.replaceAll('_addbtn', ' ');
+    blocId = blocId.trim()
+    var node = createCard(type, blocId + "item".concat((item_index++).toString()), itemSize, 'item');
+    document.getElementById(blocId).insertAdjacentElement('beforeend', node);
+    var existing_bloc_nbr = document.getElementById(blocId).getElementsByClassName('item').length;
+    updateItemLayout(blocId, existing_bloc_nbr)
+}
+
+function removeLastBloc(){
+    if(bloc_index > 0) {
+        document.querySelectorAll('.row.bloc:last-child').item(0).remove();
+        bloc_index--;
+
+    }
+    else{
+        var BLOC_ERROR_MESSAGE = 'Aucun bloc a supprimer';
+        window.alert(BLOC_ERROR_MESSAGE);
+    }
+}
+
+function removeLastItem(containerId){
+
+    let blocId = containerId.replaceAll('_removebtn', ' ');
+    blocId = blocId.trim();
+    try {
+        document.getElementById(blocId).querySelectorAll('.item:last-child').item(0).remove();
+        item_index--;
+        var existing_bloc_nbr = document.getElementById(blocId).getElementsByClassName('item').length;
+        updateItemLayout(blocId, existing_bloc_nbr)
+    }catch (e) {
+        var ITEM_ERROR_MESSAGE = "Impossible de supprimer l'item";
+        window.alert(ITEM_ERROR_MESSAGE);
+    }
+}
+
+function updateItemLayout(blocId ,numberOfItem){
+    document.querySelectorAll('#'.concat(blocId + ' .item')).
+
+    forEach(function (item) {
+        let newclass;
+        if(item.className.search('col-sm') > -1){
+
+            newclass = item_class_layout[2] + (12/numberOfItem) + ' '+item.className.slice((item_class_layout[2].length+2),)
+        }else if(item.className.search('col-lg') > -1) {
+            newclass = item_class_layout[0] + (12/numberOfItem) +' '+ item.className.slice((item_class_layout[2].length+2),)
+        }
+        item.className = newclass;
+    })
+    console.log(item_index)
+}
+
+function createdropdown(id, classname) {
+
+    var container = document.createElement('div');
+    container.className = 'dropdown';
+
+    var dropdown = document.createElement('button');
+    dropdown.className = 'dropdown-toggle '.concat(classname);
+    dropdown.type = 'button';
+    //dropdown.href = '#homeSubmenu';
+    dropdown.setAttribute('data-bs-toggle', "dropdown");
+    dropdown.setAttribute('aria-expanded', "false");
+    dropdown.innerText = 'Ajouter item';
+
+    var ulist = document.createElement('ul');
+    ulist.className ='dropdown-menu';
+    ulist.setAttribute('aria-labelledby', id.toString());
+
+    var li1 = document.createElement('li');
+    li1.id = id.toString()
+    var lia1 = document.createElement('a');
+    lia1.className = 'dropdown-item';
+    lia1.href = "#";
+    lia1.innerText = 'Graphique';
+    li1.addEventListener('click',function (btn) {
+        addItem(this.id, 'graph' )
+    })
+
+    li1.appendChild(lia1);
+
+    var li2 = document.createElement('li');
+    li2.id = id.toString()
+    var lia2 = document.createElement('a');
+    lia2.className = 'dropdown-item';
+    lia2.href = "#";
+    lia2.innerText = 'Afficheur';
+    li2.addEventListener('click',function (btn) {
+        addItem(this.id)
+    })
+    li2.appendChild(lia2);
+
+    ulist.append(li1);
+    ulist.append(li2);
+    container.append(dropdown);
+    container.append(ulist);
+
+    return container
+}
+
+function createSidebar(){
+    var wrapper = document.createElement('div');
+    wrapper.id  = 'sidebarMenu';
+    wrapper.className = 'wrapper';
+    var nav = document.createElement('nav');
+    nav.id = 'sidebar';
+    nav.className = "col-md-3 col-lg-2 d-md-block bg-light sidebar collapse";
+    var header = document.createElement('div')
+    header.className = 'sidebar-header';
+    header.innerHTML = '<h3>Bootstrap Sidebar</h3>'
+    var list = document.createElement('ul');
+    list.className = "list-unstyled components";
+    var dHead = document.createElement('p');
+    dHead.innerText = 'Dummy Heading';
+    var active = document.createElement('li');
+    active.className = 'active';
+    var dropdown = document.createElement('a');
+    dropdown.className = 'dropdown-toggle';
+    dropdown.href = '#homeSubmenu';
+    dropdown.setAttribute('data-toggle',"collapse");
+    dropdown.setAttribute('aria-expanded', "false");
+    dropdown.innerText = 'Home';
+    var homeSubmenu = document.createElement('ul');
+    homeSubmenu.className = 'collapse list-unstyled';
+    homeSubmenu.id = 'homeSubmenu';
+    var sub = document.createElement('li');
+    sub.innerHTML = '<a href="#">Home 1</a>';
+    homeSubmenu.append(sub);
+    active.append(dropdown);
+    active.append(homeSubmenu)
+    list.append(dHead);
+    list.append(active);
+    nav.append(header);
+    nav.append(list);
+    wrapper.append(nav);
+    var mainNode = document.body.querySelector('main');
+    //mainNode.className = 'col-md-9 ms-sm-auto col-lg-10 px-md-4';
+    document.querySelector("body").insertBefore(wrapper, mainNode);
+}
+
+function resetLayout() {
+    document.getElementById('bloc_container').innerHTML =" ";
+    item_index = 0;
+    bloc_index = 0;
+}
+
+function prepare_layout(){
+    var layout = {};
+    var item_type;
+    var i = 0;
+    document.querySelectorAll('.bloc').forEach(function (bloc) {
+        var j = 0;
+        var dict = {}
+        bloc.querySelectorAll('.item').forEach(function (item) {
+            if(item.className.search('graphique') > -1){
+                item_type = item.querySelector('select').value
+            }else
+                item_type = 'number';
+
+            dict['item_'.concat((j++).toString())] = item_type;
+        })
+        layout['bloc_'.concat((i++).toString())] = dict;
+    })
+    //console.log(layout)
+    return layout;
+}
+
+function save(){
+    var str_layout = prepare_layout();
+    $( "#id_layout_dict" ).val(str_layout);
+    var modeleTitle = (document.getElementById('model_title').value.length > 0 ? document.getElementById('model_title').value : 'ModeleX');
+    $("#id_modele_title").val(modeleTitle)
+
+    if(document.getElementById('id_layout_dict').value === 'null' ||
+        document.getElementById('id_layout_dict').value === ''){
+        alert('impossible de sauvegarder')
+        return false;
+    }
+    return true;
+}
+function preview() {
+
+    var str_layout = prepare_layout();
+    $.ajax(
+        {
+            type:"POST",
+            url: "{% url 'previewLayout' %}",
+            data:{
+                csrfmiddlewaretoken: '{{ csrf_token }}',
+                layout_dict: str_layout
+            },
+            success: function( data )
+            {
+                alert('SUCCESS')
+            }
+        }
+    )
+}
+
+</script>
+</html>

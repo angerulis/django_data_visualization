@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+     <!-- Required meta tags -->
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Poppins:300,400,500&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css?family=Source+Serif+Pro:400,600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="../static/css/jquery.multiselect.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/3.6.0/jquery.js" integrity="sha512-n/4gHW3atM3QqRcbCn6ewmpxcLAHGaDjpEBu4xZd47N0W2oQ+6q7oc3PXstrJYXcbNU1OHdQ1T7pAP+gi5Yu8g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <!-- HTML2CANVAS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <!-- Bootstrap CSS -->
+    <link rel="stylesheet" href="../static/css/bootstrap.min.css">
+
+    <!-- Style -->
+    <link rel="stylesheet" href="../static/css/style.css">
+
+        <title>Dashboard - SNDI</title>
+        <link rel="icon" type="image/x-icon" href="../static/image/sndi-icon.jpg">
+
+        <!--Load the AJAX API-->
+    <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="../static/js/number.animation.js"> </script>
+
+        <!--Load Layout generation function-->
+    <script type="text/javascript" src="../static/js/layout-generation.js"></script>
+
+        <!--Load Json data from app.py-->
+        <script>
+          tdata = JSON.parse({{ mydata | tojson | safe }});
+          mydata = tdata.data_result;
+          columns_labels = tdata.columns_labels;
+          row_list = tdata.row_list;
+          temptitle = tdata.title;
+
+          var mylayout = {
+            1 : {
+                'card1' : 'number',
+                'card2' : 'number'
+            },
+            2 : {
+                'card1' : 'BarChart'
+            },
+            3 : {
+                'card1' : 'ColumnChart',
+                'card2' : 'Line'
+            },
+            4 : {
+                'card1' : 'Table'
+            }
+          }
+
+        </script>
+        <script>
+
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart', 'controls', 'table']});
+      google.charts.setOnLoadCallback(function (){
+          $( document ).ready(function() {
+              var dict = createLayout(mylayout);
+              //addHeader();
+              //createSidebar();
+              drawChart(false, dict);
+              //Redraw the chart when resizing the window
+              window.addEventListener('resize', function () {
+                  drawChart(false, dict);
+              });
+          });
+      });
+      // Set a callback to run when the Google Visualization API is loaded.
+      //google.charts.setOnLoadCallback();
+
+        </script>
+
+        <!--SheetJS library - latest version -->
+        <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+        <!-- Load component and filter functions -->
+        <script src="../static/js/dashboard-component.js"> </script>
+    </head>
+<body>
+z
+
+</body>
+    <script>
+
+    </script>
+</html>

@@ -1,0 +1,236 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="utf-8" />
+        <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+        <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
+        <meta name="description" content="" />
+        <meta name="author" content="" />
+        <title>Dashboard - SNDI</title>
+        <link rel="icon" type="image/x-icon" href="{% static 'image/sndi-icon.jpg' %}">
+        <script type="text/javascript" src="https://www.gstatic.com/charts/loader.js"></script>
+        <script src="https://use.fontawesome.com/releases/v6.1.0/js/all.js" crossorigin="anonymous"></script>
+
+        <!-- custom stylesheet-->
+        <link href="{% static 'css/styles.css'%}" rel="stylesheet" />
+
+        <!-- multiselect style -->
+        <link rel="stylesheet" href="{% static 'css/jquery.multiselect.css'%}">
+
+        <!-- Bootstrap CSS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.1.3/dist/js/bootstrap.bundle.min.js" crossorigin="anonymous"></script>
+
+        <!--Animation file-->
+        <script src="{% static 'js/number.animation.js' %}"> </script>
+
+        <!--SheetJS library - latest version -->
+        <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+
+        <!--Load Json data from app.py-->
+        <script>
+            tdata = {{ mydata | safe }};
+          title = tdata.data_title;
+          subtitle = tdata.data_subtitle;
+          mydata = tdata.data_result;
+          columns_labels = tdata.columns_labels;
+          row_list = tdata.row_list;
+          temptitle = tdata.title;
+
+          var mylayout = {
+              1 : {
+                  'card1' : 'number',
+                  'card2' : 'number',
+                  'card3' : 'number'
+              },
+              2 : {
+                'card1' : 'ColumnChart'
+              },
+              3 : {
+                'card1' : 'BarChart',
+                'card2' : 'number'
+              },
+              4 : {
+                'card1' : 'PieChart',
+                'card2' : 'Line'
+              },
+              5 : {
+                'card1' : 'Table'
+              }
+          }
+          var Layout = {'hasLayout' : false,
+          'layoutKeys' : 'null'};
+
+        </script>
+        <script>
+
+      // Load the Visualization API and the corechart package.
+      google.charts.load('current', {'packages':['corechart', 'controls', 'table']});
+      google.charts.setOnLoadCallback(function (){
+          $( document ).ready(function() {
+              //addHeader();
+              //createSidebar();
+              Layout['hasLayout'] = true;
+              Layout['layoutKeys'] = createLayout(mylayout);
+              drawChart(Layout['layoutKeys']);
+              add_download('.card-header.chart-title', ['Image', 'Données CSV', 'Données Excel']);
+              //Redraw the chart when resizing the window
+              window.addEventListener('resize', function () {
+                  reload_dashboard();
+              });
+          });
+      });
+      // Set a callback to run when the Google Visualization API is loaded.
+      //google.charts.setOnLoadCallback();
+
+        </script>
+
+        <!-- HTML2CANVAS -->
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" integrity="sha512-BNaRQnYJYiPSqHHDb58B0yaPfCu+Wgds8Gp/gU33kqBtgNS4tSPHuGibyoeqMV/TJlSKda6FXzoEyYGjTe+vXA==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+        <!--SheetJS library - latest version -->
+        <script lang="javascript" src="https://cdn.sheetjs.com/xlsx-latest/package/dist/xlsx.full.min.js"></script>
+        <!-- Load component and filter functions -->
+        <script src="{% static 'js/dashboard-component.js' %}"> </script>
+
+    </head>
+    <body class="sb-nav-fixed">
+        <nav class="sb-topnav navbar navbar-expand navbar-light bg-light">
+            <!-- Navbar Brand-->
+            <a class="navbar-brand ps-3" href="index.html"><img class="img-fluid" src="{% static 'image/Logo-SNDI.png' %}"></a>
+            <!-- Sidebar Toggle-->
+            <button class="btn btn-link btn-sm order-1 order-lg-0 me-4 me-lg-0" id="sidebarToggle" href="#!"><i class="fas fa-bars"></i></button>
+            <!-- Navbar Search-->
+            <form class="d-none d-md-inline-block form-inline ms-auto me-0 me-md-3 my-2 my-md-0">
+                <div class="input-group">
+                    <input class="form-control" type="text" placeholder="Search for..." aria-label="Search for..." aria-describedby="btnNavbarSearch" />
+                    <button class="btn btn-primary" id="btnNavbarSearch" type="button"><i class="fas fa-search"></i></button>
+                </div>
+            </form>
+
+        </nav>
+        <div id="layoutSidenav">
+            <div id="layoutSidenav_nav">
+                <nav class="sb-sidenav accordion sb-sidenav-light" id="sidenavAccordion">
+                    <div class="sb-sidenav-menu">
+                        <div class="nav">
+                            <div class="sb-sidenav-menu-heading">Core</div>
+                            <a class="nav-link" href="index.html">
+                                <div class="sb-nav-link-icon"><i class="fas fa-tachometer-alt"></i></div>
+                                Tableau de bord
+                            </a>
+                            <div class="sb-sidenav-menu-heading">Interface</div>
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts" aria-expanded="false" aria-controls="collapseLayouts">
+                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                                Ministères
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse" id="collapseLayouts" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    <a class="nav-link" href="">Transport</a>
+                                    <a class="nav-link" href="#">Education</a>
+                                    <a class="nav-link" href="#">Autres</a>
+                                </nav>
+                            </div>
+                            <div class="sb-sidenav-menu-heading">Rapport</div>
+
+                            <a class="nav-link collapsed" href="#" data-bs-toggle="collapse" data-bs-target="#collapseLayouts2" aria-expanded="false" aria-controls="collapseLayouts">
+                                <div class="sb-nav-link-icon"><i class="fas fa-columns"></i></div>
+                                Imprimer
+                                <div class="sb-sidenav-collapse-arrow"><i class="fas fa-angle-down"></i></div>
+                            </a>
+                            <div class="collapse" id="collapseLayouts2" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
+                                <nav class="sb-sidenav-menu-nested nav">
+                                    <a class="nav-link" id="reportPDF" href="#">En PDF</a>
+                                </nav>
+                            </div>
+
+                        </div>
+                    </div>
+
+                </nav>
+            </div>
+            <div id="layoutSidenav_content">
+
+                <h1 class="mt-4">Tableau de bord</h1>
+                <ol class="breadcrumb mb-4">
+                    <li class="breadcrumb-item active h3"><script>document.write(title)</script></li>
+                </ol>
+
+                <div class="card mb-4" >
+                    <h2 class="text-center"><script>document.write(subtitle)</script></h2>
+                    <div class="container text-left">
+                        <div class="row justify-content-center">
+                            <div class="col-md-3" id = 'row_filter'>
+                            </div>
+                        </div>
+                        <div class="data-picked font-weight-light"></div>
+                    </div>
+                </div>
+
+                <div  class="card mb-4" disabled="true" hidden>
+                    <div class="card-body" id="filter_div"></div>
+                </div>
+                <div class="card mb-4">
+                    <div class="card-body" id="column_Filter"></div>
+                </div>
+
+                <footer class="py-4 bg-light mt-auto">
+                    <div class="container-fluid px-4">
+                        <div class="d-flex align-items-center justify-content-between small">
+                            <div class="text-muted">Copyright &copy; Client <script>var yea = new Date().getFullYear();
+                                document.write(yea);
+                            </script> </div>
+                            <div>
+                                <a href="https://sndi.ci/">Design by SNDI</a>
+                                &middot;
+
+                            </div>
+                        </div>
+                    </div>
+                </footer>
+            </div>
+        </div>
+
+        <script src="{% static 'js/layout-generation.js'%}"></script>
+        <script src="{% static 'js/jquery-3.3.1.min.js'%}"></script>
+        <script src="{% static 'js/scripts.js'%}"></script>
+        <script src="{% static 'js/jquery.multiselect.js'%}"></script>
+
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/popper.js/2.9.2/umd/popper.min.js" integrity="sha512-2rNj2KJ+D8s1ceNasTIex6z4HWyOnEYLVC3FigGOmyQCZc2eBXKgOxQmo3oKLHyfcj53uz4QMsRCWNbLd32Q1g==" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+        <script src="{% static 'js/sideBar-component.js'%}"></script>
+
+        <script>
+        displayCol(columns_labels);
+        $('select option:nth-child(1)').prop("selected", true);
+        $('select option:nth-child(2)').prop("selected", true);
+        $('select option:nth-child(3)').prop("selected", true);
+
+        $('select[multiple]').multiselect({
+                onOptionClick: function( element, option ){
+                    var thisOpt = $(option);
+                    reload_dashboard();
+                    },
+                columns: 2,
+                placeholder: 'Element',
+                search: true,
+                searchOptions: {
+                    'default': 'Recherche Element'
+                },
+                selectAll: true
+        	});
+
+
+        function reload_dashboard(layoutKey = Layout['layoutKeys'], isDownload = false){
+            try {
+                //addHeader();
+                // createSidebar();
+                drawChart(layoutKey);
+            }catch (e) {
+                console.log(e.message);
+            }
+
+        }
+    </script>
+    </body>
+</html>
