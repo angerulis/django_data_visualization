@@ -29,10 +29,7 @@
     <div class="collapse navbar-collapse" id="navbarScroll">
       <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
         <li class="nav-item px-1">
-            <form method = "POST"  action="{% url 'previewLayout'%}">
-                {% csrf_token %}
-                <a target="_blank" class="btn btn-warning" onclick="preview()" type="submit" href="{% url 'previewLayout' %}">Previsualiser</a>
-            </form>
+                <a class="btn btn-warning" target="preview_page" >Previsualiser</a>
         </li>
           <li class="nav-item px-1">
               <a class="btn btn-bd-light" onclick="resetLayout()" href="#">Annuler</a>
@@ -346,7 +343,9 @@ function save(){
 function preview() {
 
     var str_layout = prepare_layout();
-    $.ajax(
+
+    //Send post request to display preview
+   $.ajax(
         {
             type:"POST",
             url: "{% url 'previewLayout' %}",
@@ -356,6 +355,10 @@ function preview() {
             },
             success: function( data )
             {
+                let preview = window.open('','preview_page');
+                // write some HTML to that window
+                preview.document.write(data);
+                
                 alert('SUCCESS')
             }
         }

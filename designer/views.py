@@ -1,7 +1,7 @@
 import json
 
-from django.shortcuts import render
-from django.http import HttpResponse
+from django.shortcuts import render, redirect
+from django.http import HttpResponse, HttpResponseRedirect
 from designer.models import models
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
@@ -9,12 +9,10 @@ from myapp.analytics.data_analysis import renderdata
 from designer.dForm import LayoutForm
 from .models import Item, ItemBloc, TypeItem, Bloc, BlocEcran, Ecran, Modele
 from urllib import parse
+from myapp.models import Education
 
 
 # Create your views here.
-
-def preview(request):
-    render(request, 'blocForm.html', {'modele_data': {}})
 
 
 def buildmodele(request):
@@ -83,5 +81,23 @@ def buildmodele(request):
         #  statut = 'successful'
     else:
         formset = LayoutForm()
-
     return render(request, 'blocForm.html', {'formset': formset})
+
+
+def preview(request):
+    try:
+        edu = Education.objects.all().values()
+        data = renderdata(edu)
+        response = redirect('modeleForm')
+        if request.method == 'POST':
+            formset = LayoutForm(request.POST, request.FILES)
+
+            if formset.is_valid:
+                layout = formset.data['layout_dict']
+                json_object = json.loads(layout)
+                return render(request, 'preview.html', {'mydata': data, 'data_layout': json_object})
+        else:
+            return response
+
+    except ObjectDoesNotExist:
+        raise Http404("Preview page does not exist")
