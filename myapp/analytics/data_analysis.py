@@ -19,7 +19,7 @@ def renderdata(queryobject):
     data_result.insert(0, data.columns.tolist())
     columns_labels = data.columns.values.tolist()
     row_list = data['rubrique'].values.tolist()
-    data_result = json.dumps({'data_title': " Donnee du Ministere de l'education Nationale",
+    data_result = json.dumps({'data_title': " Donnée du Ministère de l'education Nationale",
                               'data_subtitle': "Education Nationale",
                               'data_result': data_result,
                               'columns_labels': columns_labels,
@@ -50,10 +50,9 @@ def data_selection1(df):
     return code_dict
 
 
-def renderdata1(query='SELECT * FROM "BD_DATABASE"."BD_DATABASE_PRESIDENCE".transport;'):
+def renderdata1(queryobject):
     # function used to render data from database to JSON data by passing through some steps
-    con = getconnection()
-    dataframe = pd.read_sql_query(query, con)  # execute query
+    dataframe = pd.DataFrame(list(queryobject))
     data = data_selection1(dataframe)
     data = data['TRANS_AER_FRETAER']
 
@@ -63,7 +62,7 @@ def renderdata1(query='SELECT * FROM "BD_DATABASE"."BD_DATABASE_PRESIDENCE".tran
     data_result.insert(0, data.columns.tolist())
     columns_labels = data.columns.values.tolist()
     row_list = data['mois'].values.tolist()
-    data_result = json.dumps({'data_title': " Données du Ministere du Transport",
+    data_result = json.dumps({'data_title': " Données du Ministère du Transport",
                               'data_subtitle': "Fret Aérien Domestiques",
                               'data_result': data_result,
                               'columns_labels': columns_labels,

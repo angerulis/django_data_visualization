@@ -37,6 +37,7 @@ class Transport(models.Model):
     filename = models.CharField(max_length=255, null=False)
     code = models.CharField(primary_key=True, max_length=255, null=False)
     rubrique = models.CharField(max_length=255, null=False)
+    annee = models.IntegerField()
     janvier = models.IntegerField()
     fevrier = models.IntegerField()
     mars = models.IntegerField()

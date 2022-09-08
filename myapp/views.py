@@ -6,7 +6,7 @@ from django.http import HttpResponse, HttpResponseRedirect
 from myapp.models import Education, Transport, Trytable
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
-from myapp.analytics.data_analysis import renderdata
+from myapp.analytics.data_analysis import renderdata, renderdata1
 from designer.dForm import LayoutForm
 from designer.models import Item, ItemBloc, TypeItem, Bloc, BlocEcran, Ecran, Modele
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
@@ -45,10 +45,34 @@ def logout_request(request):
 def transport(request):
     try:
         trans = Transport.objects.all().values()
-        data = renderdata(trans)
-    except Transport.DoesNotExist:
-        raise Http404("Transport not exist")
-    return render(request, 'index.html', {'mydata': data, 'pageTitle': 'Min trans'})
+        data = renderdata1(trans)
+
+        mylayout = {
+            1: {
+                'card1': 'number',
+                'card2': 'number',
+                'card3': 'number'
+            },
+            2: {
+                'card1': 'ColumnChart'
+            },
+            3: {
+                'card1': 'BarChart',
+            },
+            4: {
+                'card1': 'PieChart',
+                'card2': 'Line'
+            },
+            5: {
+                'card1': 'Table'
+            }
+        }
+        jsonlayout = json.dumps(mylayout)
+
+    except ObjectDoesNotExist:
+        raise Http404("Object does not exist")
+
+    return render(request, 'index.html', {'mydata': data, 'mylayout': jsonlayout})
 
 
 @login_required
@@ -78,6 +102,8 @@ def education(request):
             }
         }
         jsonlayout = json.dumps(mylayout)
+
+
 
     except ObjectDoesNotExist:
         raise Http404("Object does not exist")
