@@ -29,7 +29,12 @@
     <div class="collapse navbar-collapse" id="navbarScroll">
       <ul class="navbar-nav me-auto my-2 my-lg-0 navbar-nav-scroll" style="--bs-scroll-height: 100px;">
         <li class="nav-item px-1">
-                <a class="btn btn-warning" target="preview_page" >Previsualiser</a>
+            <form name="preview_layout" target="preview_page" onsubmit="preview()" method="post" action="{% url 'previewLayout' %}">
+                          {% csrf_token %}
+                <input id="id_preview_input" type="hidden" name="preview_input" />
+                <button type="submit" class="btn btn-warning" target="preview_page" >Previsualiser</button>
+            </form>
+
         </li>
           <li class="nav-item px-1">
               <a class="btn btn-bd-light" onclick="resetLayout()" href="#">Annuler</a>
@@ -343,9 +348,10 @@ function save(){
 function preview() {
 
     var str_layout = prepare_layout();
+    document.getElementById('id_preview_input').value = str_layout
 
     //Send post request to display preview
-   $.ajax(
+   /* $.ajax(
         {
             type:"POST",
             url: "{% url 'previewLayout' %}",
@@ -357,12 +363,13 @@ function preview() {
             {
                 let preview = window.open('','preview_page');
                 // write some HTML to that window
+                location.href()
                 preview.document.write(data);
-                
+
                 alert('SUCCESS')
             }
         }
-    )
+    )*/
 }
 
 </script>

@@ -32,7 +32,6 @@
             var mylayout = {{ mylayout | safe }}
         </script>
                 <!--Load Json data from app.py-->
-
         <script>
             tdata = {{ mydata | safe }};
 
@@ -101,9 +100,6 @@
 
     </head>
     <body class="sb-nav-fixed">
-    {% block nav_side_bar %}
-    
-    {% endblock %}
         <nav class="sb-topnav navbar navbar-expand navbar-light bg-light">
             <!-- Navbar Brand-->
             <a class="navbar-brand ps-3" href="index.html"><img class="img-fluid" src="{% static 'image/Logo-SNDI.png' %}"></a>

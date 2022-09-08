@@ -6,7 +6,7 @@ from designer.models import models
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from myapp.analytics.data_analysis import renderdata
-from designer.dForm import LayoutForm
+from designer.dForm import LayoutForm, PreviewFrom
 from .models import Item, ItemBloc, TypeItem, Bloc, BlocEcran, Ecran, Modele
 from urllib import parse
 from myapp.models import Education
@@ -81,7 +81,8 @@ def buildmodele(request):
         #  statut = 'successful'
     else:
         formset = LayoutForm()
-    return render(request, 'blocForm.html', {'formset': formset})
+        formset_preview = PreviewFrom()
+    return render(request, 'blocForm.html', {'formset': formset, 'formset_preview': formset_preview})
 
 
 def preview(request):
@@ -90,10 +91,10 @@ def preview(request):
         data = renderdata(edu)
         response = redirect('modeleForm')
         if request.method == 'POST':
-            formset = LayoutForm(request.POST, request.FILES)
+            formset_preview = PreviewFrom(request.POST, request.FILES)
 
-            if formset.is_valid:
-                layout = formset.data['layout_dict']
+            if formset_preview.is_valid:
+                layout = formset_preview.data['preview_input']
                 json_object = json.loads(layout)
                 return render(request, 'preview.html', {'mydata': data, 'data_layout': json_object})
         else:

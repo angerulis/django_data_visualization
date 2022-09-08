@@ -9,3 +9,6 @@ class LayoutForm(forms.Form):
     modele_title = forms.CharField(max_length=100, widget=forms.HiddenInput)
     layout_dict = forms.JSONField(widget=forms.HiddenInput)
 
+
+class PreviewFrom(forms.Form):
+    layout_dict = forms.JSONField(widget=forms.HiddenInput)
