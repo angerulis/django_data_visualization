@@ -68,7 +68,6 @@ def education(request):
             },
             3: {
                 'card1': 'BarChart',
-                'card2': 'number'
             },
             4: {
                 'card1': 'PieChart',
