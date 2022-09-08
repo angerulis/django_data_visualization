@@ -211,6 +211,12 @@
             }
 
         }
+        function disableAll() {
+            document.querySelectorAll('a').forEach(function(link){
+                link.href = "javascript: void(0)"
+            })
+        }
+        disableAll()
     </script>
     </body>
 </html>

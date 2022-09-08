@@ -1,5 +1,6 @@
 import json
 
+from django.contrib.auth.decorators import login_required
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
 from designer.models import models
@@ -14,14 +15,15 @@ from myapp.models import Education
 
 # Create your views here.
 
-
+@login_required(login_url='/admin')
 def buildmodele(request):
     # create object of form
+    MESSAGE = ""
     if request.method == 'POST':
         formset = LayoutForm(request.POST, request.FILES)
+        formset_preview = PreviewFrom()
 
         if formset.is_valid:
-
             layout = formset.data['layout_dict']
             modele_title = formset.data['modele_title']
             json_object = json.loads(layout)
@@ -72,8 +74,12 @@ def buildmodele(request):
                     itembloc_ = ItemBloc(item_id=item_.item_id, bloc_id=bloc_.bloc_id, x=x, y=0, h=0)
                     itembloc_.save()
                     x = x + 1
+                    MESSAGE = modele_title, 'Sauvegardé '
 
-            render(request, 'blocForm.html', {'formset': formset})
+            MESSAGE = modele_title + ' Sauvegardé '
+            render(request, 'blocForm.html', {'formset': formset, 'MESSAGE': MESSAGE})
+        else:
+            MESSAGE = "Une Erreur lors de la Sauvegarde du modele "
 
         # check if form data is valid
         # if formset.is_valid():
@@ -82,9 +88,11 @@ def buildmodele(request):
     else:
         formset = LayoutForm()
         formset_preview = PreviewFrom()
-    return render(request, 'blocForm.html', {'formset': formset, 'formset_preview': formset_preview})
+
+    return render(request, 'blocForm.html', {'formset': formset, 'formset_preview': formset_preview, 'MESSAGE': MESSAGE})
 
 
+@login_required(login_url='/admin')
 def preview(request):
     try:
         edu = Education.objects.all().values()
