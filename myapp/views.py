@@ -48,7 +48,10 @@ def logout_request(request):
 
 
 @login_required
+@permission_required('myapp.view_transport', raise_exception=True)
 def transport(request):
+    perms = request.user.get_all_permissions()
+    print(perms)
     try:
         trans = Transport.objects.all().values()
         data = renderdata1(trans)
@@ -75,14 +78,20 @@ def transport(request):
         }
         jsonlayout = json.dumps(mylayout)
 
+
     except ObjectDoesNotExist:
         raise Http404("Object does not exist")
 
-    return render(request, 'index.html', {'mydata': data, 'mylayout': jsonlayout, 'user': request.user})
+    return render(request, 'index.html', {
+        'mydata': data, 'mylayout': jsonlayout, 'user': request.user, 'page_title': 'Ministère du transport'})
 
 
 @login_required
+@permission_required('myapp.view_education')
 def education(request):
+    perms = request.user.get_group_permissions()
+    print(perms)
+    group = request.user.groups.values()
     try:
         edu = Education.objects.all().values()
         data = renderdata(edu)
@@ -113,4 +122,5 @@ def education(request):
         raise Http404("Object does not exist")
 
     user = request.user
-    return render(request, 'index.html', {'mydata': data, 'mylayout': jsonlayout})
+    return render(request, 'index.html', {'mydata': data, 'mylayout': jsonlayout,
+                                          'page_title': "Ministère de l'education Nationale "})
