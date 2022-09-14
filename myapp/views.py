@@ -10,13 +10,18 @@ from myapp.analytics.data_analysis import renderdata, renderdata1
 from designer.dForm import LayoutForm
 from designer.models import Item, ItemBloc, TypeItem, Bloc, BlocEcran, Ecran, Modele
 from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
-from django.contrib.auth.decorators import login_required
-from django.contrib.auth import authenticate, login, logout
+from django.contrib.auth.decorators import login_required, permission_required, user_passes_test
+from django.contrib.auth import authenticate, login, logout, models
 
 
 # Create your views here.
 
 def login_request(request):
+    user = request.user
+    if user.is_authenticated and not user.is_anonymous:
+        user1 = user
+        return redirect('transport')
+
     error_message = False
     if request.method == 'POST':
         form = AuthenticationForm(request=request, data=request.POST)
@@ -27,7 +32,8 @@ def login_request(request):
             if user is not None:
                 login(request, user)
                 # messages.info(request, f"You are now logged in as {username}")
-                return redirect('education')
+                return redirect('transport')
+
             error_message = True
         error_message = True
     form = AuthenticationForm()
@@ -38,7 +44,7 @@ def login_request(request):
 @login_required
 def logout_request(request):
     logout(request)
-    return redirect('education')
+    return redirect('transport')
 
 
 @login_required
@@ -72,7 +78,7 @@ def transport(request):
     except ObjectDoesNotExist:
         raise Http404("Object does not exist")
 
-    return render(request, 'index.html', {'mydata': data, 'mylayout': jsonlayout})
+    return render(request, 'index.html', {'mydata': data, 'mylayout': jsonlayout, 'user': request.user})
 
 
 @login_required
@@ -103,9 +109,8 @@ def education(request):
         }
         jsonlayout = json.dumps(mylayout)
 
-
-
     except ObjectDoesNotExist:
         raise Http404("Object does not exist")
 
+    user = request.user
     return render(request, 'index.html', {'mydata': data, 'mylayout': jsonlayout})
