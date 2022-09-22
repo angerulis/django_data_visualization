@@ -89,7 +89,8 @@ def buildmodele(request):
         formset = LayoutForm()
         formset_preview = PreviewFrom()
 
-    return render(request, 'blocForm.html', {'formset': formset, 'formset_preview': formset_preview, 'MESSAGE': MESSAGE})
+    return render(request, 'blocForm.html',
+                  {'formset': formset, 'formset_preview': formset_preview, 'MESSAGE': MESSAGE})
 
 
 @login_required(login_url='/admin')
@@ -110,3 +111,27 @@ def preview(request):
 
     except ObjectDoesNotExist:
         raise Http404("Preview page does not exist")
+
+
+def get_layout(current_ecran_id):
+    if not isinstance(current_ecran_id, int):
+        return {}
+    layout = dict()
+    bloc_ecran = BlocEcran.objects.filter(ecran_id=current_ecran_id).order_by('y')
+    i = 1
+    for be in bloc_ecran.values():  # iterate through all BlocEcran instances
+        bloc = {}
+        j = 1
+        for bl in ItemBloc.objects.values('item_id', 'x').filter(bloc_id=be['bloc_id']).order_by('x'):
+            # iterate each bloc
+            # bloc_id = be['bloc_id']
+            # item_bloc = ItemBloc.objects.order_by('x').values('item_id', 'x').get(bloc_id=bloc_id)
+            # get item model instance label from bloc id
+            item = Item.objects.values('item_libelle').get(item_id=bl.get('item_id'))
+            bloc['card' + str(j)] = item['item_libelle']
+            j += 1
+
+        layout[i] = bloc
+        i = i + 1
+
+    return layout

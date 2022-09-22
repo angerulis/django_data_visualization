@@ -5,7 +5,6 @@ from django.views.generic import RedirectView
 from . import views
 
 urlpatterns = [
-    path('admin/', admin.site.urls, name='admin'),
     path('creermodele/', views.buildmodele, name='modeleForm'),
     path('preview/', views.preview, name='previewLayout'),
 ]

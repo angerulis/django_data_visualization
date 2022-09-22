@@ -3,7 +3,7 @@ import json
 from django.contrib.auth import authenticate
 from django.shortcuts import render, redirect
 from django.http import HttpResponse, HttpResponseRedirect
-from myapp.models import Education, Transport, Trytable
+from myapp.models import Education, Transport
 from django.http import Http404
 from django.core.exceptions import ObjectDoesNotExist
 from myapp.analytics.data_analysis import renderdata, renderdata1
@@ -19,7 +19,6 @@ from django.contrib.auth import authenticate, login, logout, models
 def login_request(request):
     user = request.user
     if user.is_authenticated and not user.is_anonymous:
-        user1 = user
         return redirect('transport')
 
     error_message = False
@@ -46,12 +45,13 @@ def logout_request(request):
     logout(request)
     return redirect('transport')
 
+def get_layout(modele):
+    Modele.objects.filter()
 
 @login_required
 @permission_required('myapp.view_transport', raise_exception=True)
 def transport(request):
-    perms = request.user.get_all_permissions()
-    print(perms)
+
     try:
         trans = Transport.objects.all().values()
         data = renderdata1(trans)
@@ -89,9 +89,7 @@ def transport(request):
 @login_required
 @permission_required('myapp.view_education')
 def education(request):
-    perms = request.user.get_group_permissions()
-    print(perms)
-    group = request.user.groups.values()
+
     try:
         edu = Education.objects.all().values()
         data = renderdata(edu)

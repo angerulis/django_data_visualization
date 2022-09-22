@@ -57,18 +57,3 @@ class Transport(models.Model):
 
     def __str__(self):
         return self.code
-
-
-class Trytable(models.Model):
-    name = models.CharField(max_length=255, null=False)
-    number = models.IntegerField(primary_key=True)
-
-    def __unicode__(self):
-        return self.name
-
-    def __repr__(self):
-        return str(self.name)
-
-    class Meta:
-        managed = False
-        db_table = 'trytable'
