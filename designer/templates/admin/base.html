@@ -1,0 +1,18 @@
+{% extends 'admin/base.html' %}
+{% load static %}
+{% block dark-mode-vars %}{% endblock %}
+{% block extrastyle %}{{ block.super }}
+<style>
+:root {
+  --primary: #00be5b;
+  --secondary: #00622d;
+  --link-fg: #007033;
+  --link-selected-fg: #009848;
+    --link-hover-color: #fe8200;
+    --accent: #fe8200;
+    --header-color: #ffb76c;
+
+}
+</style>
+{% endblock %}
+

@@ -10,11 +10,11 @@ class DecimalEncoder(json.JSONEncoder):
         return json.JSONEncoder.default(self, obj)
 
 
-def renderdata(queryobject):
+def renderdata(queryobject, rubriques=None):
     # function used to render data from database to JSON data by passing through some steps
 
     dataframe = pd.DataFrame(list(queryobject))
-    data = data_selection(dataframe)
+    data = data_selection(dataframe, rubriques=rubriques)
     data_result = data.values.tolist()
     data_result.insert(0, data.columns.tolist())
     columns_labels = data.columns.values.tolist()
@@ -70,10 +70,29 @@ def renderdata1(queryobject):
     return data_result
 
 
-def data_selection(df):  # education table
+# get data row that contain specifics rubriques
+def get_rubriques(df, rubriques=None):
+    if rubriques is None:
+        df = df.drop(columns='code', axis=1)
+        # if no rubriques selected fu return the full dataset
+        return df
+
+    if isinstance(df, pd.DataFrame) and df is not None:
+        rub = df[df['rubrique'].str.lower().str.contains(rubriques)]
+        rub = rub.drop(columns='code', axis=1)
+
+        return rub
+
+
+def data_selection(df, rubriques=None):  # education table
     # Select specifics data from the dataframe in argument
     # This only works for Education table
+
     if isinstance(df, pd.DataFrame) and df is not None:
+
+        # get rubrique data dict from list
+        edu_data = get_rubriques(df, rubriques=rubriques)
+
         # Primary data
 
         # select rows from rubric column data that contains specifics information;
@@ -103,7 +122,7 @@ def data_selection(df):  # education table
         # print(primaire_nb.describe())
         primaire_nb = primaire_nb.drop(columns='code', axis=1)
 
-        return primaire_nb
+        return edu_data
 
     return 0
 

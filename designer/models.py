@@ -50,7 +50,8 @@ class Assignation(models.Model):
     date_debut = models.DateField(blank=True, null=True)
     date_fin = models.DateField(blank=True, null=True)
     actif = models.BooleanField(blank=True, null=True)
-    inactif = models.BooleanField(blank=True, null=True)
+
+    # inactif = models.BooleanField(blank=True, null=True)
 
     class Meta:
         managed = False
@@ -230,14 +231,15 @@ class TypeItem(models.Model):
 
 
 class Utilisateur(models.Model):
-    user = models.OneToOneField(User, verbose_name='Utilisateur', on_delete=models.CASCADE)
-    utilisateur_id = models.AutoField(primary_key=True)
+    utilisateur = models.OneToOneField(User, verbose_name='User', on_delete=models.CASCADE, primary_key=True)
+    utilisateur_nom = models.CharField(max_length=30, verbose_name='Nom', blank=True, null=True)
     utilisateur_prenom = models.CharField(max_length=30, verbose_name='Prénom', blank=True, null=True)
     utilisateur_contact = models.CharField(max_length=20, verbose_name='Contact', blank=True, null=True)
     utilisateur_email = models.CharField(max_length=30, verbose_name='Email', blank=True, null=True)
     utilisateur_fonction = models.CharField(max_length=30, verbose_name='Fonction', blank=True, null=True)
 
     class Meta:
+        verbose_name = "Profile utilisateur"
         managed = False
         db_table = 'utilisateur'
 
