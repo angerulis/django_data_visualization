@@ -37,25 +37,37 @@ def cleaning_df(dataframe):
     return "Error in dataset"
 
 
-def data_selection1(df):
-    df.drop('filename', axis=1, inplace=True)
-    code_dict = {}
+# Transport data
+def data_selection1(df, rubriques=None):
 
-    for code in df['code'].unique():
-        code_dict[code] = df[df['code'] == code].groupby(['annee']).mean().reset_index()
-        code_dict[code]['annee'] = code_dict[code]['annee'].astype(str)
-        code_dict[code] = code_dict[code].set_index('annee')
-        code_dict[code] = code_dict[code].transpose()
+    if isinstance(df, pd.DataFrame) and df is not None:
+        df = get_rubriques(df, rubriques=rubriques)
+        df.drop('filename', axis=1, inplace=True)
 
-    return code_dict
+        # code_dict = {}
+
+        # for code in df['code'].unique():
+        #    code_dict[code] = df[df['code'] == code].groupby(['annee']).mean().reset_index()
+        #    code_dict[code]['annee'] = code_dict[code]['annee'].astype(str)
+        #    code_dict[code] = code_dict[code].set_index('annee')
+        #    code_dict[code] = code_dict[code].transpose()
+
+        # return code_dict
+
+        df = df.groupby(['annee']).mean().reset_index()
+        df['annee'] = df['annee'].astype(str)
+        df = df.set_index('annee')
+        df = df.transpose()
+
+    return df
 
 
-def renderdata1(queryobject):
+# For transport data
+def renderdata1(queryobject, rubrique=None):
     # function used to render data from database to JSON data by passing through some steps
     dataframe = pd.DataFrame(list(queryobject))
-    data = data_selection1(dataframe)
-    data = data['TRANS_AER_FRETAER']
-
+    data = data_selection1(dataframe, rubriques=rubrique)
+    # data = data['TRANS_AER_FRETAER']
     data = data.reset_index()
     data.rename(columns={'index': 'mois'}, inplace=True)
     data_result = data.values.tolist()
@@ -63,7 +75,7 @@ def renderdata1(queryobject):
     columns_labels = data.columns.values.tolist()
     row_list = data['mois'].values.tolist()
     data_result = json.dumps({'data_title': " Données du Ministère du Transport",
-                              'data_subtitle': "Fret Aérien Domestiques",
+                              'data_subtitle': str.capitalize(rubrique),
                               'data_result': data_result,
                               'columns_labels': columns_labels,
                               'row_list': row_list})
@@ -89,7 +101,6 @@ def data_selection(df, rubriques=None):  # education table
     # This only works for Education table
 
     if isinstance(df, pd.DataFrame) and df is not None:
-
         # get rubrique data dict from list
         edu_data = get_rubriques(df, rubriques=rubriques)
 
@@ -98,29 +109,29 @@ def data_selection(df, rubriques=None):  # education table
         # select rows from rubric column data that contains specifics information;
 
         # Select rows from the table where rubrique contains word primaire
-        primaire = df[df['rubrique'].str.lower().str.contains('primaire')]
+        # primaire = df[df['rubrique'].str.lower().str.contains('primaire')]
         # Select rows among the past result (primaire) containing word nombre
-        primaire_nb = primaire[primaire['rubrique'].str.lower().str.contains('nombre')]
+        # primaire_nb = primaire[primaire['rubrique'].str.lower().str.contains('nombre')]
         # classify the result from the primaire_nb by 'public', 'prive' and 'communautaire'
-        primaire_nb_public = primaire_nb[(primaire_nb['rubrique'].str.lower().str.contains('publi'))]
-        primaire_nb_prive = primaire_nb[(primaire_nb['rubrique'].str.lower().str.contains('privé'))]
-        primaire_nb_commu = primaire_nb[(primaire_nb['rubrique'].str.lower().str.contains('communautaire'))]
+        # primaire_nb_public = primaire_nb[(primaire_nb['rubrique'].str.lower().str.contains('publi'))]
+        # primaire_nb_prive = primaire_nb[(primaire_nb['rubrique'].str.lower().str.contains('privé'))]
+        # primaire_nb_commu = primaire_nb[(primaire_nb['rubrique'].str.lower().str.contains('communautaire'))]
         # Select rows from the table that don't contain any of word privé, public and communautaire
         # and select the total values
-        primaire_nb_total = primaire_nb.drop(primaire_nb_commu['rubrique'].index) \
-            .drop(primaire_nb_prive['rubrique'].index) \
-            .drop(primaire_nb_public['rubrique'].index)
+        # primaire_nb_total = primaire_nb.drop(primaire_nb_commu['rubrique'].index) \
+        #    .drop(primaire_nb_prive['rubrique'].index) \
+        #    .drop(primaire_nb_public['rubrique'].index)
 
         # transform the resulting data into plottable table for json
         # Then gather the result in a single dictionary
-        result = {"primaire_nb_total": data_transformation(primaire_nb_total),
-                  "primaire_nb_commu": data_transformation(primaire_nb_commu),
-                  "primaire_nb_prive": data_transformation(primaire_nb_prive),
-                  "primaire_nb_public": data_transformation(primaire_nb_public),
-                  }
+        # result = {"primaire_nb_total": data_transformation(primaire_nb_total),
+        #         "primaire_nb_commu": data_transformation(primaire_nb_commu),
+        #          "primaire_nb_prive": data_transformation(primaire_nb_prive),
+        #         "primaire_nb_public": data_transformation(primaire_nb_public),
+        #          }
 
         # print(primaire_nb.describe())
-        primaire_nb = primaire_nb.drop(columns='code', axis=1)
+        # primaire_nb = primaire_nb.drop(columns='code', axis=1)
 
         return edu_data
 

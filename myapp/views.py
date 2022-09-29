@@ -83,10 +83,14 @@ def logout_request(request):
 
 @login_required
 @permission_required('myapp.view_transport', raise_exception=True)
-def transport(request):
+def transport(request, rubrique=''):
     try:
+        rubriques = ['fret aérien', "véhicules d'occasion immatriculés",
+                     'véhicules neufs  immatriculés', 'passagers commerciaux',
+                     'passagers aériens'
+                     ]
         trans = Transport.objects.all().values()
-        data = renderdata1(trans)
+        data = renderdata1(trans, rubrique=rubrique)
         jsonlayout = json.dumps(get_layout(38))
 
     except ObjectDoesNotExist:
@@ -94,18 +98,21 @@ def transport(request):
 
     return render(request, 'index.html', {
         'mydata': data, 'mylayout': jsonlayout, 'session': request.session,
-        'page_title': 'Ministère du transport', 'user': request.user})
+        'page_title': 'Ministère du transport', 'user': request.user,
+        'rubrique_list': rubriques,
+        'current_rubrique': rubrique,
+        'path': 'transport',
+    })
 
 
 @login_required
 @permission_required('myapp.view_education')
-def education(request):
+def education(request, rubrique=''):
     try:
-        rubrique = []
+        rubriques = ['primaire', 'secondaire', 'groupes pédagogiques', 'enseignant']
         edu = Education.objects.all().values()
-        data = renderdata(edu)
+        data = renderdata(edu, rubriques=rubrique)
         jsonlayout = json.dumps(get_layout(38))
-
 
     except ObjectDoesNotExist:
         raise Http404("Object does not exist")
@@ -113,4 +120,8 @@ def education(request):
     user = request.user
     return render(request, 'index.html', {'mydata': data, 'mylayout': jsonlayout,
                                           'page_title': "Ministère de l'education Nationale ",
+                                          'rubrique_list': rubriques,
+                                          'current_rubrique': rubrique,
+                                          'path': 'education',
+
                                           })

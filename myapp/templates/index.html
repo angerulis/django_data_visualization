@@ -157,12 +157,15 @@
                             </a>
                             <div class="collapse" id="collapseLayouts_rubrique" aria-labelledby="headingOne" data-bs-parent="#sidenavAccordion">
                                 <nav class="sb-sidenav-menu-nested nav">
-                                    {% for mydatum in mydata %}
+                                    {% for rubrique in rubrique_list %}
+                                        {% url path rubrique=rubrique as rub_url  %}
+                                        {% if current_rubrique == rubrique %}
+                                            <a class="nav-link" style="background-color:#e9ecef" href="{{rub_url}}">{{ rubrique.capitalize }}</a>
+                                        {% else %}
+                                            <a class="nav-link" href="{{rub_url}}">{{ rubrique.capitalize }}</a>
+                                        {% endif %}
 
                                     {% endfor %}
-
-                                    <a class="nav-link" href="{% url 'transport' %}">Transport</a>
-                                    <a class="nav-link" href="{% url 'education' %}">Education</a>
                                 </nav>
                             </div>
 
@@ -203,11 +206,11 @@
 
                 <h1 class="mt-4">Tableau de bord</h1>
                 <ol class="breadcrumb mb-4">
-                    <li class="breadcrumb-item active h3"><script>document.write(title)</script></li>
+                    <li class="breadcrumb-item active h3"><script>document.write(title.toString())</script></li>
                 </ol>
 
                 <div class="card mb-4" >
-                    <h2 class="text-center"><script>document.write(subtitle)</script></h2>
+                    <h2 class="text-center"><script>document.write(subtitle.toString())</script></h2>
                     <div class="container text-left">
                         <div class="row justify-content-center">
                             <div class="col-md-3" id = 'row_filter'>
